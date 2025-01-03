@@ -1,26 +1,31 @@
 #include <Python.h>
-// #include "snek.hh"
+#include "snek.hh"
 
+extern "C" {
 
-static PyObject* nothing(PyObject* self, PyObject* args) {
+PyObject* nothing(PyObject* self, PyObject* args) {
+     (void)self, (void) args;
     return Py_None;
 }
 
 
-static PyObject* hello(PyObject* self, PyObject* args) {
-    return Py_BuildValue("s", "HELLO!");
+PyObject* hello(PyObject* self, PyObject* args) {
+    (void)self, (void) args;
+    return snek::ToPyValue("HELLO!");
 }
 
-static PyObject* tup(PyObject* self, PyObject* args) {
-    return Py_BuildValue("(i, i, i)", 1, 2, 3);
+PyObject* tup(PyObject* self, PyObject* args) {
+    (void)self, (void) args;
+    return snek::ToPyValue(1, 2, 3);
 }
 
-static PyObject* lis(PyObject* self, PyObject* args) {
-    return Py_BuildValue("[i, i, i]", 1, 2, 3);
+PyObject* lis(PyObject* self, PyObject* args) {
+    (void)self, (void) args;
+    return snek::ToPyList(1, 2, 3);
 }
 
 // Define the methods in the module
-static PyMethodDef Methods[] = {
+PyMethodDef Methods[] = {
     {"hello", hello, METH_NOARGS, nullptr},
     {"nothing", nothing, METH_NOARGS, nullptr},
     {"tup", tup, METH_NOARGS, nullptr},
@@ -36,8 +41,13 @@ static struct PyModuleDef testmod = {
     "Test module",
     -1,
     Methods,
+    0,
+    0,
+    0,
+    0,
 };
 
 PyMODINIT_FUNC PyInit_testmod(void) {
     return PyModule_Create(&testmod);
+}
 }
