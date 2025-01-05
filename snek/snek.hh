@@ -5,6 +5,12 @@
 #include "runtime.hh"
 
 #include <Python.h>
+#include <cstddef>
+#include <ios>
+#include <iomanip>
+#include <ostream>
+#include <sstream>
+#include <string>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -83,10 +89,18 @@ PyObject *FuncWrapper(PyObject *self, PyObject *args) {
 /*
     Export function
 */
+template<int N>
+struct _GetCallMethod { static constexpr int value = METH_VARARGS; static constexpr const char *name = "METH_VARARGS"; };
+
+template<>
+struct _GetCallMethod<0> { static constexpr int value = METH_NOARGS; static constexpr const char *name = "METH_NOARGS"; };
+
+template<>
+struct _GetCallMethod<1> { static constexpr int value = METH_O; static constexpr const char *name = "METH_O"; };
 
 template<auto Fn, std::enable_if_t<std::is_same_v<decltype(Fn), PyCFunction>, int> = 0>
 void ExportFn(const char *name, const char *doc = nullptr) {
-    constexpr int call_method = get_fnptr<decltype(Fn)>::type::n_args == 0? METH_NOARGS : METH_VARARGS;
+    constexpr int call_method = _GetCallMethod<get_fnptr<decltype(Fn)>::type::n_args>::value; 
 
     _methods.push_back(
         PyMethodDef{name, Fn, call_method, doc}
@@ -100,6 +114,41 @@ void ExportFn(const char *name, const char *doc = nullptr) {
     _methods.push_back(
         PyMethodDef{name, FuncWrapper<Fn>, call_method, doc}
     );
+}
+
+
+template<typename T, typename A, typename... Args>
+std::string _GenSignature(fnptr_t<T, A, Args...>) {
+    using _fntpr = fnptr<T, Args...>;
+    std::stringstream ss;
+    ss << "(" << GetFmtStrT<A>();
+    
+    ((ss << ", " << GetFmtStrT<Args>()), ...);
+
+    ss << ") -> " << GetFmtStrT<typename _fntpr::return_type>();
+    return ss.str();
+}
+
+template<typename T>
+std::string _GenSignature(fnptr_t<T>) {
+    using _fntpr = fnptr<T>;
+    std::stringstream ss;
+    ss << "() -> " << GetFmtStrT<typename _fntpr::return_type>();
+    return ss.str();
+}
+
+template<auto Fn, std::enable_if_t<!std::is_same_v<decltype(Fn), PyCFunction>, int> = 0>
+std::string GenFnInfo(const char *name) {
+    using _fntpr = get_fnptr_t<decltype(Fn)>;
+    using _callMeth = _GetCallMethod<_fntpr::n_args>;
+    
+    std::stringstream ss;
+
+    ss << "Generated PyCFunction <" << name << ">" << std::endl
+              << "\t Base signature: " << _GenSignature(Fn) << std::endl
+              << "\t Call method:    " << _callMeth::name << "(" << std::setbase(16) << std::showbase << _callMeth::value << ")" << std::endl;
+
+    return ss.str();
 }
 
 /*
