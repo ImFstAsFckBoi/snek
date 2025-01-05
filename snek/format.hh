@@ -19,8 +19,6 @@ constexpr const char *GetFmtStrV() { return "()"; };
 
 constexpr const char *GetFmtStrV(const char *) { return "s"; };
 
-constexpr const char *GetFmtStrV(std::string const &) { return "s"; };
-
 constexpr const char *GetFmtStrV(int) { return "i"; };
 
 constexpr const char *GetFmtStrV(long) { return "l"; };
@@ -46,9 +44,6 @@ constexpr const char *GetFmtStrT<void>() { return "()"; };
 
 template<>
 constexpr const char *GetFmtStrT<const char *>() { return "s"; };
-
-template<>
-constexpr const char *GetFmtStrT<std::string const &>() { return "s"; };
 
 template<>
 constexpr const char *GetFmtStrT<int>() { return "i"; };
