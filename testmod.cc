@@ -1,4 +1,4 @@
-#include "snek.hh"
+#include "snek/snek.hh"
 
 
 

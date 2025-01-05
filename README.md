@@ -3,10 +3,10 @@ Small [pybind11](https://github.com/pybind/pybind11) inspired C++17 library for 
 Not very complete or correct. Mostly just for practicing the Python API and C++ metaprogramming.
 
 ## Usage
-It's header only, so just include the [snek.hh file](./snek.hh).
+It's header only, so just include the [snek/snek.hh](./snek/snek.hh) file.
 Then use the `SNEK_ExportMod`and `snek::ExportFn` functions to expose you C++ functions as a Python module. Classes are not implemented yet. 
 ```cpp
-#include "snek.hh"
+#include "snek/snek.hh"
 
 int mult(int a, int b) {return a * b;}
 
