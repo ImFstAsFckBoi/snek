@@ -83,8 +83,14 @@ template<typename Ret, typename... Args>
 using fnptr_t = Ret (*)(Args...);
 
 template <typename T>
-struct get_fnptr;
+struct get_fnptr {
+    static_assert(false, "Type is not a function!");
+};
 
+template <typename Ret, typename... Args>
+struct get_fnptr<Ret(*&)(Args...)> {
+    using type = fnptr<Ret, Args...>;
+};
 
 template <typename Ret, typename... Args>
 struct get_fnptr<Ret(*)(Args...)> {
@@ -93,5 +99,10 @@ struct get_fnptr<Ret(*)(Args...)> {
 
 template <typename T>
 using get_fnptr_t = typename get_fnptr<T>::type;
+
+
+template <typename T>
+using void_return = typename get_fnptr_t<T>::return_type;
+
 
 }
