@@ -7,6 +7,10 @@
 
 namespace snek {
 
+/*
+    Join strings
+*/
+
 template<typename T>
 void _join(std::stringstream &ss, std::string const &, T arg) {
     ss << arg;
@@ -26,6 +30,9 @@ std::string join(std::string const &delim, Ts... args) {
     return ss.str();
 }
 
+/*
+    Iterable type trait
+*/
 
 template<typename T, typename = void>
 struct is_iterable {
@@ -37,6 +44,9 @@ struct is_iterable<T, std::void_t<decltype(std::begin(std::declval<T>()), std::e
     static constexpr bool value = true;
 };
 
+/*
+    Function pointer type traits
+*/
 
 template<int N, typename T, typename... Ts>
 struct helper_nth_of_pack {
@@ -102,7 +112,11 @@ using get_fnptr_t = typename get_fnptr<T>::type;
 
 
 template <typename T>
-using void_return = typename get_fnptr_t<T>::return_type;
+struct has_void_return {
+    static constexpr bool value = std::is_void_v<typename get_fnptr_t<T>::return_type>;
+};
 
+template <typename T>
+constexpr bool has_void_return_v = has_void_return<T>::value;
 
 }

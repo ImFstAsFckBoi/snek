@@ -53,13 +53,13 @@ void _ParseToTuple(PyObject *src_args, const char *fmt_str, Tuple& dest_args, st
     PyArg_ParseTuple(src_args, fmt_str, &std::get<Idxs>(dest_args)...);
 }
 
-template<typename Fn, typename Tuple, std::size_t... Idxs, std::enable_if_t<!std::is_void_v<void_return<Fn>>, int> = 0>
+template<typename Fn, typename Tuple, std::size_t... Idxs, std::enable_if_t<!has_void_return_v<Fn>, int> = 0>
 PyObject *_InvokeWithTupleArgs(Fn&& fn, Tuple const &args, std::index_sequence<Idxs...>) {
     auto&& ret = fn(std::get<Idxs>(args)...); 
     return snek::ToPyValue(std::forward<typename get_fnptr_t<Fn>::return_type>(ret));
 }
 
-template<typename Fn, typename Tuple, std::size_t... Idxs, std::enable_if_t<std::is_void_v<void_return<Fn>>, int> = 0>
+template<typename Fn, typename Tuple, std::size_t... Idxs, std::enable_if_t<has_void_return_v<Fn>, int> = 0>
 PyObject *_InvokeWithTupleArgs(Fn&& fn, Tuple const &args, std::index_sequence<Idxs...>) {
     fn(std::get<Idxs>(args)...); 
     return Py_None;
