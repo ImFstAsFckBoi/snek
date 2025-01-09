@@ -1,3 +1,8 @@
 compile_commands.json
 testmod.so
 .cache
+.venv
+*.egg-info
+build
+dist
+__pycache__

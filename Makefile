@@ -1,10 +1,10 @@
-CFLAGS =  --std=c++17 -Wall -Wextra $(shell pkg-config --cflags python3) -shared -fPIC
+.PHONY: clean sdist wheel
 
-files = snek/*.hh
+wheel:
+	python3 -m build --wheel
 
-testmod.so: testmod.cc $(files)
-	c++ testmod.cc -o testmod.so ${CFLAGS}
+sdist:
+	python3 -m build --sdist
 
-.PHONY: clean
 clean:
-	rm testmod.so
+	rm -rf testmod.so *.egg-info build dist

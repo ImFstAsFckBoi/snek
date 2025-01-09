@@ -1,0 +1,2 @@
+[build-system]
+requires = ["setuptools", "snek @ file://../"]  # PEP 508 specifications.
