@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Python.h>
-#include <string>
+
+#include <pytypedefs.h>
+#include <methodobject.h>
 
 namespace snek {
 
@@ -59,5 +60,20 @@ constexpr const char *GetFmtStrT<double>() { return "d"; };
 
 template<>
 constexpr const char *GetFmtStrT<PyObject *>() { return "O"; };
+
+
+/*
+    Call methods
+*/
+
+template<int N>
+struct _GetCallMethod { static constexpr int value = METH_VARARGS; static constexpr const char *name = "METH_VARARGS"; };
+
+template<>
+struct _GetCallMethod<0> { static constexpr int value = METH_NOARGS; static constexpr const char *name = "METH_NOARGS"; };
+
+template<>
+struct _GetCallMethod<1> { static constexpr int value = METH_O; static constexpr const char *name = "METH_O"; };
+
 
 }

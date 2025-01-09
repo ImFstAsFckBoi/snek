@@ -1,12 +1,13 @@
 #pragma once
 
+#include "utility.hh"
 #include "format.hh"
 
-#include <Python.h>
 #include <set>
 #include <string>
 #include <vector>
 #include <sstream>
+#include <modsupport.h>
 
 
 namespace snek {
@@ -82,6 +83,35 @@ const char *_create_parse_fmt() {
     _create_parse_fmt_inner<Ts...>(fmt);
     auto [new_it, _] = _fmt_store.insert(fmt.str());
     return new_it->c_str();
+}
+
+
+/*
+    To Python value
+*/
+
+template<typename T, std::enable_if_t<!is_iterable<T>::value, int> = 0>
+PyObject *ToPyValue(T arg) {
+    return Py_BuildValue(GetFmtStrV(arg), arg);
+}
+
+template<typename... Ts>
+PyObject *ToPyValue(Ts... args) {
+    return Py_BuildValue(GetFmtStrV(args...), args...);
+}
+
+PyObject *ToPyValue() {
+    return Py_BuildValue(GetFmtStrV());
+}
+
+template<typename... Ts>
+PyObject *ToPyTuple(Ts... args) {
+    return Py_BuildValue(_create_tuple_fmt(args...), args...);
+}
+
+template<typename... Ts>
+PyObject *ToPyList(Ts... args) {
+    return Py_BuildValue(_create_list_fmt(args...), args...);
 }
 
 }
